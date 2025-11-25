@@ -21,6 +21,30 @@
       ::-webkit-scrollbar-thumb:hover {
         background: #64748b; 
       }
+
+      @media print {
+          @page {
+              margin: 0.5cm;
+          }
+          body {
+              background: white !important;
+              color: black !important;
+              overflow: visible !important;
+          }
+          /* Hide everything by default */
+          body > * {
+              display: none !important;
+          }
+          /* Only show the root div and its print contents */
+          body > #root {
+              display: block !important;
+          }
+          /* Specific hiding will be handled by tailwind print classes */
+          .break-after-page {
+              break-after: page;
+              page-break-after: always;
+          }
+      }
     </style>
   <script type="importmap">
 {

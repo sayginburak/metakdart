@@ -54,9 +54,9 @@ const App: React.FC = () => {
   const selectedPlayer = selectedPlayerId ? leagueData.players.find(p => p.id === selectedPlayerId) : null;
 
   return (
-    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col">
+    <div className="min-h-screen bg-slate-900 text-slate-100 flex flex-col print:block print:h-auto print:bg-white print:text-black print:min-h-0">
       {/* Header */}
-      <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800">
+      <header className="sticky top-0 z-50 bg-slate-900/80 backdrop-blur-md border-b border-slate-800 print:hidden">
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex items-center justify-between h-20">
             <div 
@@ -97,7 +97,7 @@ const App: React.FC = () => {
       </header>
 
       {/* Mobile Navigation Bottom Bar */}
-      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-50 px-4 pb-safe">
+      <div className="md:hidden fixed bottom-0 left-0 right-0 bg-slate-900 border-t border-slate-800 z-50 px-4 pb-safe print:hidden">
         <div className="flex justify-around py-3">
           <button onClick={() => switchTab(Tab.STANDINGS)} className={`flex flex-col items-center gap-1 ${activeTab === Tab.STANDINGS ? 'text-emerald-400' : 'text-slate-500'}`}>
             <LayoutDashboard className="w-6 h-6" />
@@ -111,8 +111,8 @@ const App: React.FC = () => {
       </div>
 
       {/* Main Content */}
-      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-20 md:mb-8">
-        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500">
+      <main className="flex-1 max-w-7xl w-full mx-auto px-4 sm:px-6 lg:px-8 py-8 mb-20 md:mb-8 print:p-0 print:m-0 print:w-full print:max-w-none print:block">
+        <div className="animate-in fade-in slide-in-from-bottom-4 duration-500 print:animate-none">
           {selectedPlayerId && selectedPlayer ? (
              <PlayerDetail 
                 player={selectedPlayer} 

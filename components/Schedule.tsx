@@ -1,7 +1,7 @@
 
-import React, { useState } from 'react';
-import { LeagueData } from '../types';
-import { Calendar, ChevronLeft, ChevronRight } from 'lucide-react';
+import React, { useState, useRef } from 'react';
+import { LeagueData, Week } from '../types';
+import { Calendar, ChevronLeft, ChevronRight, Printer } from 'lucide-react';
 
 interface ScheduleProps {
   data: LeagueData;
@@ -15,6 +15,8 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
       if (data.schedule.length === 0) return 0;
       return Math.min(data.currentWeek, data.schedule.length - 1);
   });
+  
+  const printRef = useRef<HTMLDivElement>(null);
 
   const currentWeek = data.schedule[currentWeekIndex];
 
@@ -37,10 +39,56 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
       rounds.push([]); // Handle empty weeks gracefully
   }
 
+  const handlePrint = () => {
+    window.print();
+  };
+
   return (
     <div className="space-y-6">
+      {/* Print Only View */}
+      <div className="hidden print:block w-full bg-white p-4">
+        {rounds.map((roundMatches, roundIndex) => (
+            <div key={roundIndex} className={`flex flex-col justify-between ${roundIndex < rounds.length - 1 ? 'break-after-page' : ''}`} style={{ height: '260mm' }}>
+                <div>
+                    <div className="text-center mb-4">
+                        <h1 className="text-2xl font-bold text-black mb-1">{currentWeek.name} Maç Programı</h1>
+                        <p className="text-lg text-gray-600">{currentWeek.date}</p>
+                    </div>
+                    
+                    <div className="border-b-2 border-black mb-4 pb-1">
+                        <h2 className="text-xl font-bold text-black uppercase tracking-widest">
+                            {roundIndex + 1}. Maçlar
+                        </h2>
+                    </div>
+                    <div className="grid grid-cols-1 gap-3 content-start">
+                        {roundMatches.map((match) => (
+                            <div key={match.id} className="flex items-center justify-between border-b border-gray-200 pb-3 pt-1 last:border-0">
+                                <div className="flex-1 text-right text-lg font-bold text-black truncate pr-2">
+                                    {getPlayerName(match.player1Id)}
+                                </div>
+                                <div className="mx-2 w-24 text-center">
+                                    <div className="font-mono text-xl font-bold border border-gray-800 px-3 py-1.5 bg-gray-50 rounded">
+                                        {match.isCompleted ? `${match.score1} - ${match.score2}` : "   -   "}
+                                    </div>
+                                </div>
+                                <div className="flex-1 text-left text-lg font-bold text-black truncate pl-2">
+                                    {getPlayerName(match.player2Id)}
+                                </div>
+                            </div>
+                        ))}
+                    </div>
+                </div>
+                
+                {/* Footer forced to bottom of page */}
+                <div className="pb-4 text-center text-gray-500 text-xs border-t pt-2">
+                    Metak 2025-2026 Kış Dart Ligi - {currentWeek.name} - Sayfa {roundIndex + 1}/{rounds.length}
+                </div>
+            </div>
+        ))}
+      </div>
+
       {/* Week Navigator */}
-      <div className="flex items-center justify-between bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700">
+      <div className="print:hidden flex items-center justify-between bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700">
         <button 
           onClick={() => setCurrentWeekIndex(prev => Math.max(0, prev - 1))}
           disabled={currentWeekIndex === 0}
@@ -59,17 +107,27 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
             </span>
         </div>
 
-        <button 
-          onClick={() => setCurrentWeekIndex(prev => Math.min(data.schedule.length - 1, prev + 1))}
-          disabled={currentWeekIndex === data.schedule.length - 1}
-          className="p-2 hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
-        >
-          <ChevronRight className="w-6 h-6 text-emerald-400" />
-        </button>
+        <div className="flex items-center gap-2">
+            <button
+                onClick={handlePrint}
+                className="p-2 hover:bg-slate-700 rounded-lg text-emerald-400 transition-colors"
+                title="Fikstürü Yazdır"
+            >
+                <Printer className="w-6 h-6" />
+            </button>
+
+            <button 
+              onClick={() => setCurrentWeekIndex(prev => Math.min(data.schedule.length - 1, prev + 1))}
+              disabled={currentWeekIndex === data.schedule.length - 1}
+              className="p-2 hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+            >
+              <ChevronRight className="w-6 h-6 text-emerald-400" />
+            </button>
+        </div>
       </div>
 
       {/* Matches Rounds */}
-      <div className="space-y-8">
+      <div className="space-y-8 print:hidden">
         {rounds.map((roundMatches, roundIndex) => (
             <div key={roundIndex} className="animate-in slide-in-from-bottom-2 duration-500" style={{animationDelay: `${roundIndex * 100}ms`}}>
                 <div className="flex items-center gap-4 mb-4">
