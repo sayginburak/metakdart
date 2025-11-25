@@ -10,7 +10,7 @@ interface JsonPlayer {
 interface JsonWeek {
     id: number;
     date: string; // Add date to JSON interface
-    // matches can be ["p1", "p2"] OR ["p1", "p2", score1, score2]
+    // matches can be ["p1", "p2"] OR ["p1", "p2", score1, score2] OR ["p1", "p2", score1, score2, 'd']
     matches: (string | number)[][]; 
 }
 
@@ -60,11 +60,17 @@ export const loadLeagueData = async (): Promise<LeagueData> => {
           let score1: number | null = null;
           let score2: number | null = null;
           let isCompleted = false;
+          let isDefaultLoss = false;
 
           if (arr.length >= 4) {
             score1 = arr[2] as number;
             score2 = arr[3] as number;
             isCompleted = true;
+          }
+
+          if (arr.length >= 5) {
+            const defaultFlag = (arr[4] as string | undefined)?.toString().toLowerCase();
+            isDefaultLoss = defaultFlag === 'd';
           }
 
           return {
@@ -73,7 +79,8 @@ export const loadLeagueData = async (): Promise<LeagueData> => {
             player2Id,
             score1,
             score2,
-            isCompleted
+            isCompleted,
+            isDefaultLoss
           };
         })
       }));
@@ -112,14 +119,19 @@ export const recalculateStandings = (data: LeagueData): Player[] => {
           p2.stats.legsWon += match.score2;
           p2.stats.legsLost += match.score1;
 
+          const loserPoints = match.isDefaultLoss ? 0 : 1;
+          const winnerPoints = 2;
+
           if (match.score1 > match.score2) {
             p1.stats.won += 1;
-            p1.stats.points += 2;
+            p1.stats.points += winnerPoints;
             p2.stats.lost += 1;
+            p2.stats.points += loserPoints;
           } else {
             p2.stats.won += 1;
-            p2.stats.points += 2;
+            p2.stats.points += winnerPoints;
             p1.stats.lost += 1;
+            p1.stats.points += loserPoints;
           }
         }
       }

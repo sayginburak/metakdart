@@ -20,6 +20,7 @@ export interface Match {
   score1: number | null;
   score2: number | null;
   isCompleted: boolean;
+  isDefaultLoss?: boolean;
 }
 
 export interface Week {

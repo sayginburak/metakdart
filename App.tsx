@@ -1,10 +1,10 @@
-import React, { useEffect, useState } from 'react';
+import React, { useEffect, useRef, useState } from 'react';
 import { Tab, LeagueData } from './types';
 import { loadLeagueData, recalculateStandings } from './utils/mockData';
 import Standings from './components/Standings';
 import Schedule from './components/Schedule';
 import PlayerDetail from './components/PlayerDetail';
-import { LayoutDashboard, CalendarDays, Target, Sun, Moon } from 'lucide-react';
+import { LayoutDashboard, CalendarDays, Sun, Moon } from 'lucide-react';
 
 const App: React.FC = () => {
   const [activeTab, setActiveTab] = useState<Tab>(Tab.STANDINGS);
@@ -18,27 +18,43 @@ const App: React.FC = () => {
   });
   const [mobileHeaderHidden, setMobileHeaderHidden] = useState(false);
   const [mobileNavHidden, setMobileNavHidden] = useState(false);
+  const lastScrollYRef = useRef(0);
+  const downAccumRef = useRef(0);
+  const upAccumRef = useRef(0);
   useEffect(() => {
-    let lastScrollY = window.scrollY;
+    lastScrollYRef.current = window.scrollY;
     const handleScroll = () => {
       const currentY = window.scrollY;
-      const delta = currentY - lastScrollY;
-      lastScrollY = currentY;
+      const delta = currentY - lastScrollYRef.current;
+      lastScrollYRef.current = currentY;
 
       const isMobile = window.matchMedia('(max-width: 768px)').matches;
       if (!isMobile) {
         setMobileHeaderHidden(false);
         setMobileNavHidden(false);
+        downAccumRef.current = 0;
+        upAccumRef.current = 0;
         return;
       }
 
       const nearTop = currentY < 60;
-      if (delta > 8 && !nearTop) {
-        setMobileHeaderHidden(true);
-        setMobileNavHidden(true);
-      } else if (delta < -8 || nearTop) {
-        setMobileHeaderHidden(false);
-        setMobileNavHidden(false);
+      const minimalMove = Math.abs(delta) < 4;
+      if (minimalMove) return;
+
+      if (delta > 0) {
+        downAccumRef.current = Math.min(downAccumRef.current + delta, 200);
+        upAccumRef.current = 0;
+        if (downAccumRef.current > 50 && !nearTop) {
+          setMobileHeaderHidden(true);
+          setMobileNavHidden(true);
+        }
+      } else {
+        upAccumRef.current = Math.min(upAccumRef.current - delta, 200);
+        downAccumRef.current = 0;
+        if (upAccumRef.current > 40 || nearTop) {
+          setMobileHeaderHidden(false);
+          setMobileNavHidden(false);
+        }
       }
     };
 
@@ -53,6 +69,12 @@ const App: React.FC = () => {
     root.classList.add(theme);
     localStorage.setItem('theme', theme);
   }, [theme]);
+
+  const logoSrc = (() => {
+    const basePath = import.meta.env.BASE_URL || '/';
+    const normalized = basePath.endsWith('/') ? basePath : `${basePath}/`;
+    return `${normalized}metak.png`;
+  })();
 
   const toggleTheme = () => {
     setTheme(prev => prev === 'dark' ? 'light' : 'dark');
@@ -110,8 +132,8 @@ const App: React.FC = () => {
               className="flex items-center gap-3 cursor-pointer"
               onClick={() => { setSelectedPlayerId(null); setActiveTab(Tab.STANDINGS); }}
             >
-              <div className="bg-emerald-600 p-2 rounded-lg">
-                <Target className="w-8 h-8 text-white" />
+              <div className="p-1.5 rounded-xl">
+                <img src={logoSrc} alt="Metak Logo" className="w-10 h-10 object-contain" />
               </div>
               <div>
                 <h1 className="text-xl font-bold bg-gradient-to-r from-emerald-600 to-cyan-600 dark:from-emerald-400 dark:to-cyan-400 bg-clip-text text-transparent">
