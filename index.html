@@ -5,6 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
     <title>Metak 2025-2026 Kış Dart Ligi</title>
     <script src="https://cdn.tailwindcss.com"></script>
+    <script>
+      tailwind.config = {
+        darkMode: 'class',
+      }
+    </script>
     <style>
       /* Custom Scrollbar for a sleeker look */
       ::-webkit-scrollbar {
@@ -24,7 +29,8 @@
 
       @media print {
           @page {
-              margin: 0.5cm;
+              size: A4 portrait;
+              margin: 4mm 6mm 8mm;
           }
           body {
               background: white !important;
@@ -44,6 +50,29 @@
               break-after: page;
               page-break-after: always;
           }
+
+          .print-week-page {
+              padding: 8mm 8mm 6mm;
+              display: flex;
+              flex-direction: column;
+              justify-content: space-between;
+              gap: 5mm;
+              break-inside: avoid;
+              page-break-inside: avoid;
+              background: white;
+          }
+
+          .print-week-page:not(.print-week-page-last) {
+              break-after: page;
+              page-break-after: always;
+          }
+
+          .print-week-page-content {
+              flex: 1;
+              display: flex;
+              flex-direction: column;
+              gap: 3mm;
+          }
       }
     </style>
 
@@ -58,7 +87,7 @@
   }
 }
 </script>
-  <script type="module" crossorigin src="./assets/index-DYud9jr9.js"></script>
+  <script type="module" crossorigin src="./assets/index-CdgH6ntQ.js"></script>
 </head>
   <body class="bg-slate-900 text-slate-100 font-sans antialiased overflow-y-scroll">
     <div id="root"></div>
