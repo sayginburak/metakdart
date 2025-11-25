@@ -46,32 +46,35 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
   return (
     <div className="space-y-6">
       {/* Print Only View */}
-      <div className="hidden print:block w-full bg-white p-4">
+      <div className="hidden print:block w-full bg-white">
         {rounds.map((roundMatches, roundIndex) => (
-            <div key={roundIndex} className={`flex flex-col justify-between ${roundIndex < rounds.length - 1 ? 'break-after-page' : ''}`} style={{ height: '260mm' }}>
-                <div>
-                    <div className="text-center mb-4">
+            <div 
+                key={roundIndex} 
+                className={`print-week-page ${roundIndex === rounds.length - 1 ? 'print-week-page-last' : ''}`}
+            >
+                <div className="print-week-page-content">
+                    <div className="text-center">
                         <h1 className="text-2xl font-bold text-black mb-1">{currentWeek.name} Maç Programı</h1>
                         <p className="text-lg text-gray-600">{currentWeek.date}</p>
                     </div>
                     
-                    <div className="border-b-2 border-black mb-4 pb-1">
+                    <div className="border-b-2 border-black pb-2">
                         <h2 className="text-xl font-bold text-black uppercase tracking-widest">
                             {roundIndex + 1}. Maçlar
                         </h2>
                     </div>
-                    <div className="grid grid-cols-1 gap-3 content-start">
+                    <div className="grid grid-cols-1 gap-2.5 content-start">
                         {roundMatches.map((match) => (
-                            <div key={match.id} className="flex items-center justify-between border-b border-gray-200 pb-3 pt-1 last:border-0">
-                                <div className="flex-1 text-right text-lg font-bold text-black truncate pr-2">
+                            <div key={match.id} className="flex items-center justify-between border-b border-gray-200 pb-2 pt-1 last:border-0">
+                                <div className="flex-1 text-right text-base font-semibold text-black truncate pr-2">
                                     {getPlayerName(match.player1Id)}
                                 </div>
                                 <div className="mx-2 w-24 text-center">
-                                    <div className="font-mono text-xl font-bold border border-gray-800 px-3 py-1.5 bg-gray-50 rounded">
+                                    <div className="font-mono text-lg font-bold border border-gray-800 px-2.5 py-1 bg-gray-50 rounded">
                                         {match.isCompleted ? `${match.score1} - ${match.score2}` : "   -   "}
                                     </div>
                                 </div>
-                                <div className="flex-1 text-left text-lg font-bold text-black truncate pl-2">
+                                <div className="flex-1 text-left text-base font-semibold text-black truncate pl-2">
                                     {getPlayerName(match.player2Id)}
                                 </div>
                             </div>
@@ -80,7 +83,7 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
                 </div>
                 
                 {/* Footer forced to bottom of page */}
-                <div className="pb-4 text-center text-gray-500 text-xs border-t pt-2">
+                <div className="text-center text-gray-500 text-xs border-t border-gray-300 pt-2">
                     Metak 2025-2026 Kış Dart Ligi - {currentWeek.name} - Sayfa {roundIndex + 1}/{rounds.length}
                 </div>
             </div>
@@ -88,21 +91,21 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
       </div>
 
       {/* Week Navigator */}
-      <div className="print:hidden flex items-center justify-between bg-slate-800 p-4 rounded-xl shadow-lg border border-slate-700">
+      <div className="print:hidden flex items-center justify-between bg-white dark:bg-slate-800 p-4 rounded-xl shadow-sm dark:shadow-lg border border-slate-200 dark:border-slate-700 transition-colors">
         <button 
           onClick={() => setCurrentWeekIndex(prev => Math.max(0, prev - 1))}
           disabled={currentWeekIndex === 0}
-          className="p-2 hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+          className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
         >
-          <ChevronLeft className="w-6 h-6 text-emerald-400" />
+          <ChevronLeft className="w-6 h-6 text-slate-400 dark:text-emerald-400" />
         </button>
         
         <div className="flex flex-col items-center">
-            <h2 className="text-xl font-bold text-white flex items-center gap-2">
-                <Calendar className="w-5 h-5 text-emerald-400" />
+            <h2 className="text-xl font-bold text-slate-900 dark:text-white flex items-center gap-2">
+                <Calendar className="w-5 h-5 text-emerald-600 dark:text-emerald-400" />
                 {currentWeek.name}
             </h2>
-            <span className="text-sm text-emerald-400 font-medium mt-1">
+            <span className="text-sm text-emerald-600 dark:text-emerald-400 font-medium mt-1">
                 {currentWeek.date}
             </span>
         </div>
@@ -110,7 +113,7 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
         <div className="flex items-center gap-2">
             <button
                 onClick={handlePrint}
-                className="p-2 hover:bg-slate-700 rounded-lg text-emerald-400 transition-colors"
+                className="hidden sm:block p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg text-emerald-600 dark:text-emerald-400 transition-colors"
                 title="Fikstürü Yazdır"
             >
                 <Printer className="w-6 h-6" />
@@ -119,9 +122,9 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
             <button 
               onClick={() => setCurrentWeekIndex(prev => Math.min(data.schedule.length - 1, prev + 1))}
               disabled={currentWeekIndex === data.schedule.length - 1}
-              className="p-2 hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
+              className="p-2 hover:bg-slate-100 dark:hover:bg-slate-700 rounded-lg disabled:opacity-30 disabled:cursor-not-allowed transition-colors"
             >
-              <ChevronRight className="w-6 h-6 text-emerald-400" />
+              <ChevronRight className="w-6 h-6 text-slate-400 dark:text-emerald-400" />
             </button>
         </div>
       </div>
@@ -131,11 +134,11 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
         {rounds.map((roundMatches, roundIndex) => (
             <div key={roundIndex} className="animate-in slide-in-from-bottom-2 duration-500" style={{animationDelay: `${roundIndex * 100}ms`}}>
                 <div className="flex items-center gap-4 mb-4">
-                    <div className="h-px bg-slate-700 flex-1"></div>
+                    <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
                     <span className="text-xs font-bold text-slate-500 uppercase tracking-widest">
                         {roundIndex + 1}. Maçlar
                     </span>
-                    <div className="h-px bg-slate-700 flex-1"></div>
+                    <div className="h-px bg-slate-200 dark:bg-slate-700 flex-1"></div>
                 </div>
 
                 <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-x-4 gap-y-3">
@@ -149,12 +152,12 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
                             <div key={match.id} className={`
                                 flex items-center justify-between px-3 py-2.5 rounded-lg border transition-all duration-200
                                 ${isFinished 
-                                    ? 'bg-slate-800/60 border-slate-700/50' 
-                                    : 'bg-slate-800 border-slate-700 hover:border-emerald-500/30'}
+                                    ? 'bg-slate-50 dark:bg-slate-800/60 border-slate-200/50 dark:border-slate-700/50' 
+                                    : 'bg-white dark:bg-slate-800 border-slate-200 dark:border-slate-700 hover:border-emerald-500/30'}
                             `}>
                                 {/* Player 1 */}
                                 <div 
-                                    className={`flex-1 text-right text-sm font-medium truncate cursor-pointer transition-colors ${p1Win ? 'text-green-400' : p2Win ? 'text-red-400/70' : 'text-slate-300 hover:text-emerald-400'}`}
+                                    className={`flex-1 text-right text-sm font-medium truncate cursor-pointer transition-colors ${p1Win ? 'text-green-600 dark:text-green-400' : p2Win ? 'text-red-500/70 dark:text-red-400/70' : 'text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400'}`}
                                     onClick={() => onPlayerClick(match.player1Id)}
                                     title={getPlayerName(match.player1Id)}
                                 >
@@ -164,19 +167,19 @@ const Schedule: React.FC<ScheduleProps> = ({ data, onPlayerClick }) => {
                                 {/* Score Box */}
                                 <div className="mx-3 min-w-[50px] flex justify-center">
                                     {isFinished ? (
-                                        <div className="flex items-center gap-1 font-mono font-bold text-sm bg-slate-900/50 px-2 py-0.5 rounded border border-slate-700/50 shadow-sm">
-                                            <span className={p1Win ? 'text-green-400' : 'text-slate-400'}>{match.score1}</span>
-                                            <span className="text-slate-600">:</span>
-                                            <span className={p2Win ? 'text-green-400' : 'text-slate-400'}>{match.score2}</span>
+                                        <div className="flex items-center gap-1 font-mono font-bold text-sm bg-slate-100 dark:bg-slate-900/50 px-2 py-0.5 rounded border border-slate-200 dark:border-slate-700/50 shadow-sm">
+                                            <span className={p1Win ? 'text-green-600 dark:text-green-400' : 'text-slate-400'}>{match.score1}</span>
+                                            <span className="text-slate-400 dark:text-slate-600">:</span>
+                                            <span className={p2Win ? 'text-green-600 dark:text-green-400' : 'text-slate-400'}>{match.score2}</span>
                                         </div>
                                     ) : (
-                                        <span className="text-xs font-bold text-slate-600">vs</span>
+                                        <span className="text-xs font-bold text-slate-400 dark:text-slate-600">vs</span>
                                     )}
                                 </div>
 
                                 {/* Player 2 */}
                                 <div 
-                                    className={`flex-1 text-left text-sm font-medium truncate cursor-pointer transition-colors ${p2Win ? 'text-green-400' : p1Win ? 'text-red-400/70' : 'text-slate-300 hover:text-emerald-400'}`}
+                                    className={`flex-1 text-left text-sm font-medium truncate cursor-pointer transition-colors ${p2Win ? 'text-green-600 dark:text-green-400' : p1Win ? 'text-red-500/70 dark:text-red-400/70' : 'text-slate-700 dark:text-slate-300 hover:text-emerald-600 dark:hover:text-emerald-400'}`}
                                     onClick={() => onPlayerClick(match.player2Id)}
                                     title={getPlayerName(match.player2Id)}
                                 >
