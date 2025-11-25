@@ -24,7 +24,11 @@ interface JsonData {
 export const loadLeagueData = async (): Promise<LeagueData> => {
   // Fetch from JSON file - Single Source of Truth
   try {
-      const response = await fetch('league_data.json');
+      // Use import.meta.env.BASE_URL to ensure correct path in production
+      const baseUrl = import.meta.env.BASE_URL;
+      const dataUrl = baseUrl.endsWith('/') ? `${baseUrl}league_data.json` : `${baseUrl}/league_data.json`;
+      
+      const response = await fetch(dataUrl);
       if (!response.ok) {
           throw new Error(`Failed to fetch league data: ${response.statusText}`);
       }
